@@ -26,8 +26,9 @@ java {
 bukkit {
     name = "CleanroomGenerator"
     main = "io.nv.bukkit.CleanroomGenerator.CleanroomGenerator"
-    authors = listOf("NVX (Neo_Vortex)")
+    authors = listOf("NVX (Neo_Vortex)", "mikroskeem")
     description = "Custom world generator to generate flat clean rooms. y==0 is bedrock layer=height,block[:datavalue] generator id=layer[|layer[|...]] - Prefix . at the start of the ID to skip bedrock generation at layer0"
     load = net.minecrell.pluginyml.bukkit.BukkitPluginDescription.PluginLoadOrder.STARTUP
-    website = "https://dev.bukkit.org/projects/cleanroomgenerator"
+    website = "https://github.com/ZentriaMC/CleanroomGenerator"
+    apiVersion = "1.16"
 }

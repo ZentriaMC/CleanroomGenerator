@@ -6,15 +6,14 @@ import org.bukkit.Material;
 import org.bukkit.World;
 import org.bukkit.block.data.BlockData;
 import org.bukkit.generator.ChunkGenerator;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
-import java.util.Arrays;
 import java.util.Random;
-import java.util.logging.Logger;
 
-import static java.lang.System.arraycopy;
+public final class CleanroomChunkGenerator extends ChunkGenerator {
+    private static final Logger logger = LoggerFactory.getLogger(CleanroomChunkGenerator.class);
 
-public class CleanroomChunkGenerator extends ChunkGenerator {
-    private Logger log = Logger.getLogger("Minecraft");
     private BlockData[] layerBlock;
     private int[] layerHeight;
 
@@ -24,7 +23,7 @@ public class CleanroomChunkGenerator extends ChunkGenerator {
 
     CleanroomChunkGenerator(String id) {
         if (id == null || id.equals("")) {
-            id = "64|stone";
+            id = "."; // default to air
         }
 
         if (id.equals(".")) {
@@ -43,11 +42,10 @@ public class CleanroomChunkGenerator extends ChunkGenerator {
                 id = id.substring(1);
             }
 
-            String tokens[];
-
-            tokens = id.split("[|]");
-
-            if ((tokens.length % 2) != 0) throw new Exception();
+            String[] tokens = id.split("[|]");
+            if ((tokens.length % 2) != 0) {
+                throw new Exception("Uneven tokens");
+            }
 
             int layerCount = tokens.length / 2;
             layerBlock = new BlockData[layerCount];
@@ -57,7 +55,7 @@ public class CleanroomChunkGenerator extends ChunkGenerator {
                 int j = i * 2;
                 int height = Integer.parseInt(tokens[j]);
                 if (height <= 0) {
-                    log.warning("[CleanroomGenerator] Invalid height '" + tokens[j] + "'. Using 64 instead.");
+                    logger.warn("Invalid height '{}'. Using 64 instead.", tokens[j]);
                     height = 64;
                 }
 
@@ -65,8 +63,7 @@ public class CleanroomChunkGenerator extends ChunkGenerator {
                 try {
                     blockData = Bukkit.createBlockData(tokens[j + 1]);
                 } catch (Exception e) {
-                    log.warning("[CleanroomGenerator] Failed to lookup block '" + tokens[j + 1] + "'. Using stone instead. Exception: " +
-                            e.toString());
+                    logger.warn("Failed to lookup block '{}'. Using stone instead", tokens[j + 1], e);
                     blockData = Material.STONE.createBlockData();
                 }
 
@@ -74,8 +71,7 @@ public class CleanroomChunkGenerator extends ChunkGenerator {
                 layerHeight[i] = height;
             }
         } catch (Exception e) {
-            log.severe("[CleanroomGenerator] Error parsing CleanroomGenerator ID '" + id + "'. using defaults '64,1': " + e.toString());
-            e.printStackTrace();
+            logger.error("Unable to parse ID '{}'. using defaults '64,1'", id, e);
 
             layerBlock = new BlockData[2];
             layerBlock[0] = Material.BEDROCK.createBlockData();
@@ -92,9 +88,14 @@ public class CleanroomChunkGenerator extends ChunkGenerator {
         ChunkData chunk = createChunkData(world);
 
         int y = 0;
-        for (int i = 0; i < layerBlock.length; i++) {
+        for(int i = 0; i < layerBlock.length; i++) {
             chunk.setRegion(0, y, 0, 16, y + layerHeight[i], 16, layerBlock[i]);
             y += layerHeight[i];
+        }
+
+        // Set bedrock under the spawn position
+        if (chunkX == 0 && chunkZ == 0) {
+            chunk.setBlock(0, 64, 0, Material.BEDROCK);
         }
 
         return chunk;
@@ -107,12 +108,10 @@ public class CleanroomChunkGenerator extends ChunkGenerator {
         }
 
         int highestBlock = world.getHighestBlockYAt(0, 0);
-
-        if ((highestBlock <= 0) && (world.getBlockAt(0, 0, 0).getType() == Material.AIR)) // SPACE!
-        {
-            return new Location(world, 0, 64, 0); // Lets allow people to drop a little before hitting the void then shall we?
+        if ((highestBlock <= 0) && (world.getBlockAt(0, 0, 0).getType() == Material.AIR)) {
+            return new Location(world, 0, 64, 0);
         }
 
-        return new Location(world, 0, highestBlock, 0);
+        return new Location(world, 0, highestBlock + 1, 0);
     }
 }
