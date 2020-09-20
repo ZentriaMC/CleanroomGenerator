@@ -7,21 +7,22 @@ import org.bukkit.World;
 import org.bukkit.block.data.BlockData;
 import org.bukkit.generator.ChunkGenerator;
 import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import java.util.Random;
 
 public final class CleanroomChunkGenerator extends ChunkGenerator {
-    private static final Logger logger = LoggerFactory.getLogger(CleanroomChunkGenerator.class);
+    private final Logger logger;
 
     private BlockData[] layerBlock;
     private int[] layerHeight;
 
-    public CleanroomChunkGenerator() {
-        this("");
+    public CleanroomChunkGenerator(CleanroomGenerator plugin) {
+        this(plugin, "");
     }
 
-    CleanroomChunkGenerator(String id) {
+    CleanroomChunkGenerator(CleanroomGenerator plugin, String id) {
+        this.logger = plugin.getSLF4JLogger();
+
         if (id == null || id.equals("")) {
             id = "."; // default to air
         }
