@@ -6,9 +6,10 @@ import org.bukkit.Material;
 import org.bukkit.World;
 import org.bukkit.block.data.BlockData;
 import org.bukkit.generator.ChunkGenerator;
-import org.slf4j.Logger;
 
 import java.util.Random;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 public final class CleanroomChunkGenerator extends ChunkGenerator {
     private final Logger logger;
@@ -21,7 +22,7 @@ public final class CleanroomChunkGenerator extends ChunkGenerator {
     }
 
     CleanroomChunkGenerator(CleanroomGenerator plugin, String id) {
-        this.logger = plugin.getSLF4JLogger();
+        this.logger = plugin.getLogger();
 
         if (id == null || id.equals("")) {
             id = "."; // default to air
@@ -56,7 +57,7 @@ public final class CleanroomChunkGenerator extends ChunkGenerator {
                 int j = i * 2;
                 int height = Integer.parseInt(tokens[j]);
                 if (height <= 0) {
-                    logger.warn("Invalid height '{}'. Using 64 instead.", tokens[j]);
+                    logger.log(Level.WARNING, "Invalid height ''{0}''. Using 64 instead.", tokens[j]);
                     height = 64;
                 }
 
@@ -64,7 +65,7 @@ public final class CleanroomChunkGenerator extends ChunkGenerator {
                 try {
                     blockData = Bukkit.createBlockData(tokens[j + 1]);
                 } catch (Exception e) {
-                    logger.warn("Failed to lookup block '{}'. Using stone instead", tokens[j + 1], e);
+                    logger.log(Level.WARNING, "Failed to lookup block ''{0}''. Using stone instead", new Object[]{ tokens[j + 1], e });
                     blockData = Material.STONE.createBlockData();
                 }
 
@@ -72,7 +73,7 @@ public final class CleanroomChunkGenerator extends ChunkGenerator {
                 layerHeight[i] = height;
             }
         } catch (Exception e) {
-            logger.error("Unable to parse ID '{}'. using defaults '64,1'", id, e);
+            logger.log(Level.SEVERE, "Unable to parse ID ''{0}''. using defaults '64,1'", new Object[]{ id, e });
 
             layerBlock = new BlockData[2];
             layerBlock[0] = Material.BEDROCK.createBlockData();
