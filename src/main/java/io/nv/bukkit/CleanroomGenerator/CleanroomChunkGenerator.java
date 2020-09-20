@@ -94,7 +94,7 @@ public final class CleanroomChunkGenerator extends ChunkGenerator {
         }
 
         // Set bedrock under the spawn position
-        if (chunkX == 0 && chunkZ == 0) {
+        if (layerHeight.length == 0 && chunkX == 0 && chunkZ == 0) {
             chunk.setBlock(0, 64, 0, Material.BEDROCK);
         }
 
