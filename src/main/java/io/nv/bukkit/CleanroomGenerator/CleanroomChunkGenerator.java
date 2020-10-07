@@ -116,4 +116,9 @@ public final class CleanroomChunkGenerator extends ChunkGenerator {
 
         return new Location(world, 0, highestBlock + 1, 0);
     }
+
+    @Override
+    public boolean isParallelCapable() {
+        return true;
+    }
 }
