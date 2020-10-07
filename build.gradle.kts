@@ -4,7 +4,7 @@ plugins {
 }
 
 group = "eu.mikroskeem.zentria"
-version = "2.0.2"
+version = "2.0.3-SNAPSHOT"
 
 val paperApiVersion = "1.16.3-R0.1-SNAPSHOT"
 
